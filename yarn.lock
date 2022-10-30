@@ -1323,11 +1323,6 @@
     gud "^1.0.0"
     warning "^4.0.3"
 
-"@inlet/react-pixi@^6.8.0":
-  version "6.8.0"
-  resolved "https://registry.yarnpkg.com/@inlet/react-pixi/-/react-pixi-6.8.0.tgz#6d1f632c61ec814dd0306a61512c24d01e48f2f7"
-  integrity sha512-WIbmChkiM14XswP7pb8aCWR++h2qYKutNkXqYeWoDOQGKJw89278fRVC22zPYOw2SjSNVRtnLMlj4nkCfjTiFg==
-
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@istanbuljs/load-nyc-config/-/load-nyc-config-1.1.0.tgz#fd3db1d59ecf7cf121e80650bb86712f9b55eced"
