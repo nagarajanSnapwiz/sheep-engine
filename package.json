@@ -76,6 +76,7 @@
   "dependencies": {
     "@pixi/assets": "^6.5.8",
     "box2d-wasm": "^7.0.0",
-    "pixi.js": "^6.5.8"
+    "pixi.js": "^6.5.8",
+    "ticker-js": "^1.0.3"
   }
 }

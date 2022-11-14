@@ -3,7 +3,7 @@ import Box2dFactory from 'box2d-wasm';
 
 export const Box2dContext = React.createContext<typeof Box2D|null>(null)
 
-type Box2dType = typeof Box2D;
+type Box2dType = typeof Box2D & EmscriptenModule;
 
 const SCRIPT_DIRECTORY = 'https://unpkg.com/box2d-wasm@7.0.0/dist/es/';
 

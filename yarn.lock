@@ -6538,6 +6538,11 @@ eventemitter3@^3.1.0:
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.2.tgz#2d3d48f9c346698fce83a85d7d664e98535df6e7"
   integrity sha512-tvtQIeLVHjDkJYnzf2dgVMxfuSGJeM/7UCG17TT4EumTfNtF+0nebF/4zWOIkCreAbtNqhGEboB6BWrwqNaw4Q==
 
+events@^1.1.0:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/events/-/events-1.1.1.tgz#9ebdb7635ad099c70dcc4c2a1f5004288e8bd924"
+  integrity sha512-kEcvvCBByWXGnZy6JUlgAp2gBIUjfCAV6P6TgT1/aaQKcmuAEC4OZTV1I4EWQLz2gxZw76atuVyvHhTxvi0Flw==
+
 events@^3.0.0, events@^3.2.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
@@ -12411,6 +12416,19 @@ through2@^2.0.0:
   dependencies:
     readable-stream "~2.3.6"
     xtend "~4.0.1"
+
+ticker-js@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/ticker-js/-/ticker-js-1.0.3.tgz#5d28249f1163e62a5cd757d4ee2a1175de7dfc1c"
+  integrity sha512-jOCcwU5moho4rwzcH0jq5fsypCQ8WDxauE8hfLEq88PkgSLzd5L3uXPDSD3/X0M4fGU+oc6cK8Cb9j5ozygitw==
+  dependencies:
+    events "^1.1.0"
+    inherits "^2.0.1"
+
+ticker@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/ticker/-/ticker-0.1.0.tgz#f567d116d6c0bcc954a1009820743712be474199"
+  integrity sha512-CdJcWQixbHCuazTD8RCZ2EMJU7DJnTZuQ3YByBQiQA+7liXRgGOopnPox5YbSQoLPlNm5758vCfW05t3E6uIdg==
 
 timers-browserify@^2.0.4:
   version "2.0.12"
