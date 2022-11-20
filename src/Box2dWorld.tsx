@@ -2,7 +2,6 @@ import React, {
   useEffect,
   createContext,
   useRef,
-  useLayoutEffect,
   useState,
 } from 'react';
 //@ts-ignore
@@ -15,13 +14,13 @@ import * as PIXI from 'pixi.js';
 type Box2dRefType = {
   world?: Box2D.b2World;
   userDataService: UserData;
-  box2d: typeof Box2D & EmscriptenModule 
+  box2d: typeof Box2D & EmscriptenModule;
 };
 
 export const Box2dWorldContext =
   createContext<React.MutableRefObject<Box2dRefType | undefined> | null>(null);
 
-export const AppContext = createContext<PIXI.Application | null>(null)
+export const AppContext = createContext<PIXI.Application | null>(null);
 
 type WorldProps = {
   gravity?: [number, number];
@@ -44,10 +43,10 @@ function updateGraphicsPositionFromPhysics(
   if (hostRef?.current) {
     const { x, y } = recordLeak(body.GetPosition());
     const rotation = body.GetAngle();
-    Object.assign(hostRef.current, { x, y, rotation });
+
+    Object.assign(hostRef.current, { x: p2c(x), y: p2c(y), rotation });
   }
 }
-
 
 const FRAME_RATE = 60;
 const PHYSICS_STEP_DELTA = 1 / FRAME_RATE;
@@ -73,28 +72,26 @@ export function Box2dWorld({
     NULL,
   } = box2d;
 
-  const domRef = useRef<HTMLDivElement|null>(null);
-  
+  const [ready, setReady] = useState(false);
+
+  const domRef = useRef<HTMLDivElement | null>(null);
 
   const leakMitigatorRef = useRef(new LeakMitigator());
   const box2dRef = useRef<Box2dRefType>({
     world: undefined,
     userDataService: new UserData(box2d),
-    box2d
+    box2d,
   });
 
-  const app = usePixiApp({width,height, domRef: domRef})
+  const app = usePixiApp({ width, height, domRef: domRef });
 
-  console.log('app',app);
-
-
-  useEffect(()=>{
-    if(box2dRef?.current?.world){
-      const gravityVec = new b2Vec2(gravity[0],gravity[1]);
+  useEffect(() => {
+    if (box2dRef?.current?.world) {
+      const gravityVec = new b2Vec2(gravity[0], gravity[1]);
       box2dRef.current.world.SetGravity(gravityVec);
       destroy(gravityVec);
     }
-  },[gravity[0], gravity[1]]);
+  }, [gravity[0], gravity[1]]);
 
   /**
    * managing the ground of the world
@@ -108,8 +105,7 @@ export function Box2dWorld({
     box2dRef.current.world = new b2World(gravityV);
     destroy(gravityV);
     const { world, userDataService } = box2dRef.current;
-  
-    
+
     let cb: (() => void) | null = null;
     if (ground) {
       const rectangleShape = new b2PolygonShape();
@@ -128,7 +124,7 @@ export function Box2dWorld({
       def.set_type(b2_staticBody);
       def.set_position(groundPosition);
       body = recordLeak(world.CreateBody(def));
-      userDataService.setData(body, { category: '__GROUND__' });
+      userDataService.setData(body, { category: '__GROUND___' });
       // body = world.CreateBody(def);
       // userDataService.setData(body, { category: '__GROUN__' });
       // console.log('body-->||==||><',body,{Number: getPointer(body)});
@@ -153,16 +149,26 @@ export function Box2dWorld({
         getPointer(body) !== getPointer(NULL);
         body = recordLeak(body.GetNext())
       ) {
-        updateGraphicsPositionFromPhysics(body, userDataService, recordLeak);
+        if (body.IsAwake()) {
+          updateGraphicsPositionFromPhysics(body, userDataService, recordLeak);
+        }
+
         const data = userDataService.getData(body);
-        if(data.removed){
+        if (data?.removed) {
+          if (data.hostRef) {
+            data.hostRef?.current?.destroy();
+          }
+          userDataService.deleteData(body);
           world.DestroyBody(body);
         }
       }
+      app?.render();
       freeLeaked();
     });
 
     ticker.start();
+
+    setReady(true);
 
     return () => {
       ticker.stop();
@@ -183,14 +189,13 @@ export function Box2dWorld({
     };
   }, [ground, width, height]);
 
-
   return (
     <Box2dWorldContext.Provider value={box2dRef}>
       <AppContext.Provider value={app}>
-      <>
-      <div ref={domRef}></div>
-      {children}
-      </>
+        <>
+          <div ref={domRef}></div>
+          {ready ? children : null}
+        </>
       </AppContext.Provider>
     </Box2dWorldContext.Provider>
   );

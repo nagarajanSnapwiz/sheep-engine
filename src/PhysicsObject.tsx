@@ -7,10 +7,15 @@ import React, {
 } from 'react';
 import * as PIXI from 'pixi.js';
 
-import { Box2dWorldContext } from './Box2dWorld';
+import { Box2dWorldContext, AppContext } from './Box2dWorld';
 
-import { canvasToPhys, physToCanvas } from './scale';
-import { RectangleArgs, CircleArgs, createCircle, createRectangle } from './CreateSimpleShapeSprite';
+import { canvasToPhys } from './scale';
+import {
+  RectangleArgs,
+  CircleArgs,
+  createCircle,
+  createRectangle,
+} from './CreateSimpleShapeSprite';
 
 const DEGTORAD = 0.0174532925199432957;
 
@@ -25,6 +30,7 @@ type PhysicsObjectArgs = {
   width?: number;
   height?: number;
   radius?: number;
+  strokeWidth?: number;
   bullet?: boolean;
   x?: number;
   y?: number;
@@ -39,6 +45,7 @@ export function usePhysicsObject({
   friction = 0.5,
   density = 1,
   allowSleep = true,
+  strokeWidth = 0,
   shape,
   data,
   width,
@@ -48,7 +55,7 @@ export function usePhysicsObject({
   initialForce,
   bullet,
   radius,
-  angle=0,
+  angle = 0,
 }: PhysicsObjectArgs) {
   const box2dRef = useContext(Box2dWorldContext);
 
@@ -89,7 +96,7 @@ export function usePhysicsObject({
     Object.assign(fixDef, { density, friction, restitution });
     bodyDef.position.x = canvasToPhys(x);
     bodyDef.position.y = canvasToPhys(y);
-    const body = recordLeak(world.CreateBody(bodyDef));
+    const body = world.CreateBody(bodyDef);
     if (data) {
       userDataService.setData(body, data);
     }
@@ -103,7 +110,10 @@ export function usePhysicsObject({
       }
       const shape = new b2PolygonShape();
       itemsToBeDestroyed.push(shape);
-      shape.SetAsBox(canvasToPhys(width / 2), canvasToPhys(height / 2));
+      shape.SetAsBox(
+        canvasToPhys((width + strokeWidth) / 2),
+        canvasToPhys((height + strokeWidth) / 2)
+      );
       fixDef.shape = shape;
     } else if (shape === 'circle') {
       if (!radius) {
@@ -111,7 +121,7 @@ export function usePhysicsObject({
       }
       const shape = new b2CircleShape();
       itemsToBeDestroyed.push(shape);
-      shape.set_m_radius(canvasToPhys(radius));
+      shape.set_m_radius(canvasToPhys(radius + strokeWidth));
       fixDef.shape = shape;
     }
 
@@ -128,24 +138,107 @@ export function usePhysicsObject({
       destroy(forceVector);
     }
     physRef.current = body;
+    userDataService.updateData(body, { hostRef });
 
     return () => {
-      userDataService.updateData(body, { removed: true });
+      //userDataService.deleteData(body);
       itemsToBeDestroyed.forEach((x) => destroy(x));
+      //world.DestroyBody(body);
+
+      userDataService.updateData(body, { removed: true });
+
       freeLeaked();
     };
   }, []);
 
   useEffect(() => {
-    if (type==="static" && physRef.current) {
-        const box2d = box2dRef?.current?.box2d!;
-        const {b2Vec2, destroy} = box2d
-        const positionVector = new b2Vec2(x,y);
-        physRef.current.SetTransform(positionVector,angle* DEGTORAD);
-        destroy(positionVector);
+    if (type === 'static' && physRef.current) {
+      const box2d = box2dRef?.current?.box2d!;
+      const { b2Vec2, destroy } = box2d;
+      const positionVector = new b2Vec2(x, y);
+      physRef.current.SetTransform(positionVector, angle * DEGTORAD);
+      destroy(positionVector);
     }
-}, [x, y, angle]);
+  }, [x, y, angle]);
 
-  return {physRef,hostRef}
+  return { physRef, hostRef };
 }
 
+type SpriteProps = {
+  from?: string | PIXI.Texture;
+};
+
+type SimpleShapeProps = {
+  simpleShape?: boolean;
+} & (Partial<RectangleArgs> & Partial<CircleArgs>);
+
+type PhysicsObjectProps = {
+  shape: 'circle' | 'rectangle';
+} & (SpriteProps & SimpleShapeProps) &
+  PhysicsObjectArgs;
+
+export const PhysicsObject = forwardRef(
+  ({ simpleShape, from, ...props }: Omit<PhysicsObjectProps, 'app'>, ref) => {
+    const box2dRef = useContext(Box2dWorldContext);
+    const { b2Vec2, destroy } = box2dRef?.current?.box2d!;
+    const { physRef, hostRef } = usePhysicsObject(props);
+
+    const { shape } = props;
+
+    const app = useContext(AppContext)!;
+
+    useImperativeHandle(ref, () => ({
+      body: physRef,
+      applyForce: ({ x, y }: { x: number; y: number }) => {
+        const body = physRef.current;
+        if (body) {
+          const forceVector = new b2Vec2(x, y);
+          body.ApplyForce(forceVector, body.GetWorldCenter(), true);
+          destroy(forceVector);
+        }
+      },
+      applyImpulse: ({ x, y }: { x: number; y: number }) => {
+        const body = physRef.current;
+        if (body) {
+          const forceVector = new b2Vec2(x, y);
+          body.ApplyLinearImpulse(forceVector, body.GetWorldCenter(), true);
+          destroy(forceVector);
+        }
+      },
+    }));
+
+    useEffect(() => {
+      let image: PIXI.Sprite | null = null;
+      console.log('physObject eff', { simpleShape, shape });
+      if (from) {
+        image = PIXI.Sprite.from(from);
+      } else if (simpleShape) {
+        if (shape === 'circle') {
+          //@ts-ignore
+          image = createCircle({ ...props, app });
+        } else if (shape === 'rectangle') {
+          //@ts-ignore
+          image = createRectangle({ ...props, app });
+          console.log('image creating', image);
+        } else {
+          throw new Error('Unknown Shape');
+        }
+      }
+
+      if (image) {
+        console.log('image created', image);
+        image.anchor.set(0.5);
+        hostRef.current = image;
+        app.stage.addChild(image);
+      }
+
+      return () => {
+        if (image) {
+          //image.destroy(true);
+        }
+      };
+    }, []);
+
+    return null;
+  }
+);
