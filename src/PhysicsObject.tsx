@@ -155,7 +155,7 @@ export function usePhysicsObject({
     if (type === 'static' && physRef.current) {
       const box2d = box2dRef?.current?.box2d!;
       const { b2Vec2, destroy } = box2d;
-      const positionVector = new b2Vec2(x, y);
+      const positionVector = new b2Vec2(canvasToPhys(x), canvasToPhys(y));
       physRef.current.SetTransform(positionVector, angle * DEGTORAD);
       destroy(positionVector);
     }
@@ -174,14 +174,28 @@ type SimpleShapeProps = {
 
 type PhysicsObjectProps = {
   shape: 'circle' | 'rectangle';
+  cameraOffset?: { x?: number; y?: number };
 } & (SpriteProps & SimpleShapeProps) &
   PhysicsObjectArgs;
 
 export const PhysicsObject = forwardRef(
-  ({ simpleShape, from, ...props }: Omit<PhysicsObjectProps, 'app'>, ref) => {
+  (
+    {
+      simpleShape,
+      cameraOffset,
+      from,
+      ...props
+    }: Omit<PhysicsObjectProps, 'app'>,
+    ref
+  ) => {
     const box2dRef = useContext(Box2dWorldContext);
+    const { data = {} } = props;
+
     const { b2Vec2, destroy } = box2dRef?.current?.box2d!;
-    const { physRef, hostRef } = usePhysicsObject(props);
+    const { physRef, hostRef } = usePhysicsObject({
+      ...props,
+      ...(cameraOffset ? { data: { ...data, cameraOffset } } : {}),
+    });
 
     const { shape } = props;
 
@@ -209,7 +223,7 @@ export const PhysicsObject = forwardRef(
 
     useEffect(() => {
       let image: PIXI.Sprite | null = null;
-      console.log('physObject eff', { simpleShape, shape });
+      //console.log('physObject eff', { simpleShape, shape });
       if (from) {
         image = PIXI.Sprite.from(from);
       } else if (simpleShape) {
@@ -219,14 +233,14 @@ export const PhysicsObject = forwardRef(
         } else if (shape === 'rectangle') {
           //@ts-ignore
           image = createRectangle({ ...props, app });
-          console.log('image creating', image);
+          //console.log('image creating', image);
         } else {
           throw new Error('Unknown Shape');
         }
       }
 
       if (image) {
-        console.log('image created', image);
+        //console.log('image created', image);
         image.anchor.set(0.5);
         hostRef.current = image;
         app.stage.addChild(image);

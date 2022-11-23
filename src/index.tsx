@@ -4,11 +4,9 @@ import React, {
   ReactChild,
   useState,
   useEffect,
+  useRef,
 } from 'react';
-import {
-  Box2ContextWrapper,
-  useGlobalBox2d,
-} from './Box2dContextWrapper';
+import { Box2ContextWrapper } from './Box2dContextWrapper';
 import { Box2dWorld } from './Box2dWorld';
 import { PhysicsObject } from './PhysicsObject';
 
@@ -39,7 +37,6 @@ const Wrap: FC<Props> = ({ children }) => {
 };
 
 export const LogBox2d: FC<Props> = () => {
-  const { box2d, ready } = useGlobalBox2d();
   const [enable, setEnable] = useState(true);
   const [enableCircle, setEnableCircle] = useState(true);
 
@@ -48,75 +45,146 @@ export const LogBox2d: FC<Props> = () => {
     setTimeout(() => setEnableCircle(true), 13 * 1000);
   }, []);
 
-  if (!box2d) {
-    return <h1>Loading...</h1>;
-  }
+  const worldRef = useRef<any>();
 
   //console.log('loaded', { box2d, ready});
   return (
     <div>
-      <h1>{ready ? `Loaded 6 5 box2d` : `Loading...`}</h1>
-      {ready && (
-        <button onClick={() => setEnable((x) => !x)}>
-          Toggle {enable ? '600' : '300'}
-        </button>
+      <p>
+        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Id asperiores,
+        aliquid veniam ea facere alias sint cum natus itaque eaque non possimus?
+        Quae distinctio exercitationem rerum eos eligendi ab qui.
+      </p>
+      <p>
+        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Id asperiores,
+        aliquid veniam ea facere alias sint cum natus itaque eaque non possimus?
+        Quae distinctio exercitationem rerum eos eligendi ab qui.
+      </p>
+      <p>
+        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Id asperiores,
+        aliquid veniam ea facere alias sint cum natus itaque eaque non possimus?
+        Quae distinctio exercitationem rerum eos eligendi ab qui.
+      </p>
+      <p>
+        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Id asperiores,
+        aliquid veniam ea facere alias sint cum natus itaque eaque non possimus?
+        Quae distinctio exercitationem rerum eos eligendi ab qui.
+      </p>
+      <button onClick={() => setEnable((x) => !x)}>
+        Toggle {enable ? '600' : '300'}
+      </button>
+
+      {enable && (
+        <>
+          <Box2dWorld
+            ref={worldRef}
+            width={600}
+            height={300}
+            gravity={[0, 10]}
+            ground={true}
+            fallback={<h1>Loading...</h1>}
+          >
+            <PhysicsObject
+              simpleShape
+              type="static"
+              shape="rectangle"
+              density={1}
+              restitution={0.1}
+              x={180}
+              y={60}
+              height={30}
+              width={60}
+              fillColor="gray"
+              strokeWidth={20}
+              strokeColor="green"
+            />
+            <PhysicsObject
+              simpleShape
+              type="static"
+              shape="rectangle"
+              density={1}
+              restitution={0.1}
+              x={270}
+              y={150}
+              height={30}
+              width={60}
+              fillColor="gray"
+              strokeWidth={20}
+              strokeColor="green"
+            />
+
+            <PhysicsObject
+              simpleShape
+              type="static"
+              shape="rectangle"
+              density={1}
+              restitution={0.1}
+              x={355}
+              y={63}
+              height={30}
+              width={60}
+              fillColor="gray"
+              strokeWidth={20}
+              strokeColor="green"
+            />
+
+            <PhysicsObject
+              simpleShape
+              type="dynamic"
+              shape="rectangle"
+              density={1}
+              restitution={0.9}
+              x={110}
+              y={5}
+              height={30}
+              width={30}
+              fillColor="red"
+              strokeWidth={20}
+              strokeColor="blue"
+            />
+
+            <PhysicsObject
+              simpleShape
+              type="dynamic"
+              shape="rectangle"
+              density={1}
+              restitution={0.9}
+              x={100}
+              y={80}
+              cameraOffset={{ x: 70 }}
+              height={30}
+              width={90}
+              fillColor="red"
+              strokeWidth={2}
+              strokeColor="blue"
+            />
+
+            {enableCircle && (
+              <PhysicsObject
+                simpleShape
+                type="dynamic"
+                restitution={0.9}
+                shape="circle"
+                x={100}
+                y={90}
+                strokeWidth={15}
+                radius={6}
+                strokeColor="orange"
+                fillColor="violet"
+              />
+            )}
+
+            {/* <Rectangle x={30} y={5} width={100} height={70} fillColor="red" strokeWidth={2} strokeColor="green" /> */}
+            {/* <Circle radius={6} x={enable?200:400} y={90} strokeWidth={15} strokeColor="orange" fillColor='pink' /> */}
+          </Box2dWorld>
+          <button onClick={() => worldRef?.current?.setRelativeOffset(-3)}>
+            {'<- left'}
+          </button>
+          <button onClick={() => worldRef?.current?.setRelativeOffset(+3)}>
+            {'right ->'}
+          </button>
+        </>
       )}
-      {ready && <button>Toggle Noop</button>}
-      <Box2dWorld
-        width={enable ? 600 : 300}
-        height={enable ? 300 : 600}
-        gravity={[0, 10]}
-        box2d={box2d}
-        ground={true}
-      >
-        <PhysicsObject
-          simpleShape
-          type="dynamic"
-          shape="rectangle"
-          density={1}
-          restitution={0.5}
-          x={110}
-          y={5}
-          height={30}
-          width={30}
-          fillColor="red"
-          strokeWidth={20}
-          strokeColor="blue"
-        />
-
-        <PhysicsObject
-          simpleShape
-          type="dynamic"
-          shape="rectangle"
-          density={1}
-          restitution={0.4}
-          x={100}
-          y={80}
-          height={30}
-          width={90}
-          fillColor="red"
-          strokeWidth={2}
-          strokeColor="blue"
-        />
-
-        {enableCircle && (
-          <PhysicsObject
-            simpleShape
-            type="dynamic"
-            restitution={0.5}
-            shape="circle"
-            x={100}
-            y={90}
-            strokeWidth={15}
-            radius={6}
-            strokeColor="orange"
-            fillColor="violet"
-          />
-        )}
-
-        {/* <Rectangle x={30} y={5} width={100} height={70} fillColor="red" strokeWidth={2} strokeColor="green" /> */}
-        {/* <Circle radius={6} x={enable?200:400} y={90} strokeWidth={15} strokeColor="orange" fillColor='pink' /> */}
-      </Box2dWorld>
     </div>
   );
 };

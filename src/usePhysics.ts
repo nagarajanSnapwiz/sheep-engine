@@ -16,7 +16,7 @@ import React, {
     const graphicsRef = useRef<PIXI.Sprite|null>(null);
 
     useEffect(()=>{
-        console.log('graphicsRef',graphicsRef);
+        //console.log('graphicsRef',graphicsRef);
     },[shape])
 
     return [graphicsRef];
