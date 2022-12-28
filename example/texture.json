@@ -1,0 +1,303 @@
+{
+  "frames": {
+    "Woodcutter_death": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 278,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 16,
+        "w": 278,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 288,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "Woodcutter_attack1": {
+      "frame": {
+        "x": 0,
+        "y": 32,
+        "w": 270,
+        "h": 38
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 10,
+        "w": 270,
+        "h": 38
+      },
+      "sourceSize": {
+        "w": 288,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "Woodcutter_run": {
+      "frame": {
+        "x": 0,
+        "y": 70,
+        "w": 270,
+        "h": 30
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 3,
+        "y": 18,
+        "w": 270,
+        "h": 30
+      },
+      "sourceSize": {
+        "w": 288,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "Woodcutter_attack2": {
+      "frame": {
+        "x": 0,
+        "y": 100,
+        "w": 268,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 14,
+        "w": 268,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 288,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "Woodcutter_jump": {
+      "frame": {
+        "x": 0,
+        "y": 134,
+        "w": 268,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 4,
+        "y": 13,
+        "w": 268,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 288,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "Woodcutter_attack3": {
+      "frame": {
+        "x": 0,
+        "y": 169,
+        "w": 267,
+        "h": 34
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 14,
+        "w": 267,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 288,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "Woodcutter_push": {
+      "frame": {
+        "x": 0,
+        "y": 203,
+        "w": 266,
+        "h": 33
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 7,
+        "y": 15,
+        "w": 266,
+        "h": 33
+      },
+      "sourceSize": {
+        "w": 288,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "Woodcutter_craft": {
+      "frame": {
+        "x": 0,
+        "y": 236,
+        "w": 263,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 6,
+        "y": 16,
+        "w": 263,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 288,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "Woodcutter_climb": {
+      "frame": {
+        "x": 0,
+        "y": 268,
+        "w": 262,
+        "h": 33
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 5,
+        "y": 15,
+        "w": 262,
+        "h": 33
+      },
+      "sourceSize": {
+        "w": 288,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "Woodcutter_walk": {
+      "frame": {
+        "x": 278,
+        "y": 0,
+        "w": 257,
+        "h": 34
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 7,
+        "y": 14,
+        "w": 257,
+        "h": 34
+      },
+      "sourceSize": {
+        "w": 288,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "Woodcutter_idle": {
+      "frame": {
+        "x": 0,
+        "y": 301,
+        "w": 169,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 16,
+        "w": 169,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "Woodcutter_hurt": {
+      "frame": {
+        "x": 312,
+        "y": 0,
+        "w": 123,
+        "h": 33
+      },
+      "rotated": true,
+      "trimmed": true,
+      "spriteSourceSize": {
+        "x": 1,
+        "y": 15,
+        "w": 123,
+        "h": 33
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 48
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  },
+  "meta": {
+    "app": "http://free-tex-packer.com",
+    "version": "0.6.7",
+    "image": "texture.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 345,
+      "h": 333
+    },
+    "scale": 1
+  }
+}

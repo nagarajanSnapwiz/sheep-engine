@@ -22,6 +22,8 @@ type SimpleShapeProps = {
 } & DrawingOptions &
   Partial<PIXI.DisplayObject>;
 
+  
+  
 
 export const SimpleShape = forwardRef(
   (
@@ -84,7 +86,7 @@ export const SimpleShape = forwardRef(
         // }
         //app?.renderer?.plugins?.extract?.destroy();
         if (spriteRef.current) {
-          spriteRef.current.destroy(true);
+          spriteRef.current.destroy({children: true, texture: true, baseTexture: true});
         }
         if (image) {
           image.remove();

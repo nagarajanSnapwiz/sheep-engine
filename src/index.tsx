@@ -6,9 +6,13 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
+import KeyboardEventHandler from 'react-keyboard-event-handler';
+
 import { Box2ContextWrapper } from './Box2dContextWrapper';
 import { Box2dWorld } from './Box2dWorld';
 import { PhysicsObject } from './PhysicsObject';
+import { useLoader } from './useLoader';
+import { Sprite } from './DisplayObjects';
 
 //@ts-ignore
 if (import.meta.hot) {
@@ -38,7 +42,12 @@ const Wrap: FC<Props> = ({ children }) => {
 
 export const LogBox2d: FC<Props> = () => {
   const [enable, setEnable] = useState(true);
+  const squareRef = useRef();
   const [enableCircle, setEnableCircle] = useState(true);
+  const loadedResources = useLoader({
+    resources: { woodCutter: '/texture.json' },
+  });
+  console.log('loadedResources', loadedResources);
 
   useEffect(() => {
     setTimeout(() => setEnableCircle(false), 7 * 1000);
@@ -74,12 +83,12 @@ export const LogBox2d: FC<Props> = () => {
         Toggle {enable ? '600' : '300'}
       </button>
 
-      {enable && (
+      {enable && loadedResources && (
         <>
           <Box2dWorld
             ref={worldRef}
             width={600}
-            height={300}
+            height={400}
             gravity={[0, 10]}
             ground={true}
             fallback={<h1>Loading...</h1>}
@@ -113,6 +122,31 @@ export const LogBox2d: FC<Props> = () => {
               strokeColor="green"
             />
 
+            <Sprite
+              x={150}
+              y={100}
+              from={loadedResources!.woodCutter!.textures!.Woodcutter_attack1}
+              height={48}
+              scale={4}
+              width={288}
+            />
+
+            <PhysicsObject
+              type="dynamic"
+              shape="rectangle"
+              density={1}
+              restitution={0.1}
+              x={270}
+              y={250}
+              height={48*2}
+              width={288*2}
+            >
+              <Sprite
+                from={loadedResources!.woodCutter!.textures!.Woodcutter_attack1}
+                scale={2}
+              />
+            </PhysicsObject>
+
             <PhysicsObject
               simpleShape
               type="static"
@@ -133,7 +167,9 @@ export const LogBox2d: FC<Props> = () => {
               type="dynamic"
               shape="rectangle"
               density={1}
-              restitution={0.9}
+              fixedRotation={true}
+              ref={squareRef}
+              restitution={0.4}
               x={110}
               y={5}
               height={30}
@@ -143,23 +179,52 @@ export const LogBox2d: FC<Props> = () => {
               strokeColor="blue"
             />
 
-            <PhysicsObject
+            <KeyboardEventHandler
+              handleKeys={['right', 'left']}
+              handleEventType="keydown"
+              onKeyEvent={(key, e) => {
+                let velocity = { x: 0, y: 0 };
+                if (e.type === 'keydown') {
+                  if (key === 'right') {
+                    velocity.x = 5;
+                  } else if (key === 'left') {
+                    velocity.x = -5;
+                  }
+                }
+                //@ts-ignore
+                squareRef.current.setLinearVelocity(velocity);
+                //squareRef.current.applyLinearVelocity(velocity)
+                //squareRef.current.applyImpulse(impulse)
+              }}
+            />
+
+            <KeyboardEventHandler
+              handleKeys={['right', 'left']}
+              handleEventType="keyup"
+              onKeyEvent={(key, e) => {
+                //@ts-ignore
+                squareRef.current.stopMoving();
+                //squareRef.current.updateData({linearVelocity:{x:0,y:0}})
+              }}
+            />
+
+            {/* <PhysicsObject
               simpleShape
               type="dynamic"
               shape="rectangle"
               density={1}
-              restitution={0.9}
+              restitution={0.3}
               x={100}
               y={80}
-              cameraOffset={{ x: 70 }}
+
               height={30}
               width={90}
               fillColor="red"
               strokeWidth={2}
               strokeColor="blue"
-            />
+            /> */}
 
-            {enableCircle && (
+            {/* {enableCircle && (
               <PhysicsObject
                 simpleShape
                 type="dynamic"
@@ -168,11 +233,12 @@ export const LogBox2d: FC<Props> = () => {
                 x={100}
                 y={90}
                 strokeWidth={15}
+                cameraOffset={{ x: 70 }}
                 radius={6}
                 strokeColor="orange"
                 fillColor="violet"
               />
-            )}
+            )} */}
 
             {/* <Rectangle x={30} y={5} width={100} height={70} fillColor="red" strokeWidth={2} strokeColor="green" /> */}
             {/* <Circle radius={6} x={enable?200:400} y={90} strokeWidth={15} strokeColor="orange" fillColor='pink' /> */}

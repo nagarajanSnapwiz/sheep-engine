@@ -12,6 +12,8 @@ import { canvasToPhys as c2p, physToCanvas as p2c } from './scale';
 import { UserData } from './UserData';
 import { usePixiApp } from './usePixiApp';
 import { useGlobalBox2d } from './Box2dContextWrapper';
+import { Stage, Container, Sprite, render } from '@saitonakamura/react-pixi';
+
 import * as PIXI from 'pixi.js';
 
 type Box2dRefType = {
@@ -202,6 +204,8 @@ const Box2dWorld_ = forwardRef(
 
       const ticker = new Ticker(FRAME_RATE);
 
+      const velocityVector = new b2Vec2(0, 0);
+
       ticker.on('render', () => {
         world.Step(PHYSICS_STEP_DELTA, 8, 3);
         world.ClearForces();
@@ -218,6 +222,12 @@ const Box2dWorld_ = forwardRef(
             offsetRef,
             recordLeak
           );
+
+          if (data.linearVelocity) {
+            const { x, y } = data.linearVelocity;
+            velocityVector.Set(x, y);
+            body.SetLinearVelocity(velocityVector);
+          }
 
           if (data?.removed) {
             if (data.hostRef) {
@@ -236,6 +246,7 @@ const Box2dWorld_ = forwardRef(
       setReady(true);
 
       return () => {
+        destroy(velocityVector);
         ticker.stop();
         ticker.destroy();
         if (cb) {
@@ -253,6 +264,8 @@ const Box2dWorld_ = forwardRef(
         freeLeaked();
       };
     }, [ground, width, height]);
+
+
 
     return (
       <Box2dWorldContext.Provider value={box2dRef}>

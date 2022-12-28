@@ -37,6 +37,7 @@ type PhysicsObjectArgs = {
   angle?: number;
   initialForce?: [number, number];
   allowSleep?: boolean;
+  fixedRotation?: boolean;
 };
 
 export function usePhysicsObject({
@@ -56,6 +57,7 @@ export function usePhysicsObject({
   bullet,
   radius,
   angle = 0,
+  fixedRotation= false,
 }: PhysicsObjectArgs) {
   const box2dRef = useContext(Box2dWorldContext);
 
@@ -151,6 +153,10 @@ export function usePhysicsObject({
     };
   }, []);
 
+  useEffect(()=>{
+    physRef.current?.SetFixedRotation(fixedRotation)
+  },[fixedRotation])
+
   useEffect(() => {
     if (type === 'static' && physRef.current) {
       const box2d = box2dRef?.current?.box2d!;
@@ -184,14 +190,16 @@ export const PhysicsObject = forwardRef(
       simpleShape,
       cameraOffset,
       from,
+      children,
       ...props
-    }: Omit<PhysicsObjectProps, 'app'>,
+    }: Omit<PhysicsObjectProps, 'app'> & { children?: any },
     ref
   ) => {
     const box2dRef = useContext(Box2dWorldContext);
     const { data = {} } = props;
-
+    const tempHostRef = useRef();
     const { b2Vec2, destroy } = box2dRef?.current?.box2d!;
+    const userDataService = box2dRef?.current?.userDataService!;
     const { physRef, hostRef } = usePhysicsObject({
       ...props,
       ...(cameraOffset ? { data: { ...data, cameraOffset } } : {}),
@@ -211,6 +219,33 @@ export const PhysicsObject = forwardRef(
           destroy(forceVector);
         }
       },
+      setLinearVelocity: ({ x, y }: { x: number; y: number }) => {
+        const body = physRef.current;
+        if (body) {
+          const forceVector = new b2Vec2(x, y);
+          body.SetLinearVelocity(forceVector);
+          destroy(forceVector);
+        }
+      },
+      updateData: (update: Object) => {
+        const body = physRef.current;
+        if (body) {
+          userDataService.updateData(body, update);
+        }
+      },
+      applyLinearVelocity: ({ x, y }: { x: number; y: number }) => {
+        const body = physRef.current;
+        if (body) {
+          userDataService.updateData(body, { linearVelocity: { x, y } });
+        }
+      },
+      stopMoving: () => {
+        const body = physRef.current;
+        if (body) {
+          body.SetLinearVelocity(0);
+          body.SetAngularVelocity(0);
+        }
+      },
       applyImpulse: ({ x, y }: { x: number; y: number }) => {
         const body = physRef.current;
         if (body) {
@@ -222,10 +257,15 @@ export const PhysicsObject = forwardRef(
     }));
 
     useEffect(() => {
-      let image: PIXI.Sprite | null = null;
+      let image:
+        | PIXI.Sprite
+        | PIXI.NineSlicePlane
+        | PIXI.AnimatedSprite
+        | null = null;
       //console.log('physObject eff', { simpleShape, shape });
       if (from) {
         image = PIXI.Sprite.from(from);
+        Object.assign(image, props);
       } else if (simpleShape) {
         if (shape === 'circle') {
           //@ts-ignore
@@ -237,13 +277,19 @@ export const PhysicsObject = forwardRef(
         } else {
           throw new Error('Unknown Shape');
         }
+      } else if (children) {
+        image = tempHostRef.current as any;
       }
 
       if (image) {
         //console.log('image created', image);
-        image.anchor.set(0.5);
+        if ((image as PIXI.Sprite).anchor) {
+          (image as PIXI.Sprite).anchor.set(0.5);
+        }
         hostRef.current = image;
-        app.stage.addChild(image);
+        if (!children) {
+          app.stage.addChild(image);
+        }
       }
 
       return () => {
@@ -253,6 +299,6 @@ export const PhysicsObject = forwardRef(
       };
     }, []);
 
-    return null;
+    return children ? React.cloneElement(children, { ref: tempHostRef }) : null;
   }
 );

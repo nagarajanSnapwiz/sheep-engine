@@ -15,7 +15,7 @@ export function usePixiApp(options:UsePixiArgs){
 
     useEffect(()=>{
 
-        const pixiApp = new PIXI.Application(options);
+        const pixiApp = new PIXI.Application({...options, });
         if(domRef.current){
             domRef.current.textContent = "";
         }
